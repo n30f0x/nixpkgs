@@ -49,7 +49,11 @@
 }:
 
 let
-  bits = if stdenv.hostPlatform.is64bit then "x64" else "ia32";
+  bits = {
+    "x86_64" = "x64";
+    "x86_32" = "ia32";
+    "aarch64" = "arm64";
+  }."${stdenv.hostPlatform.uname.processor}";# if stdenv.hostPlatform.is64bit then "x64" else "ia32";
 
   nwEnv = buildEnv {
     name = "nwjs-env";
@@ -102,7 +106,7 @@ let
     ];
   };
 
-  version = "0.102.1";
+  version = "0.113.0";
 in
 stdenv.mkDerivation {
   pname = "nwjs";
@@ -120,8 +124,10 @@ stdenv.mkDerivation {
         {
           "sdk-ia32" = "sha256-uzDbEq2vNC+fm95Co3lnQX7mrUXsIDWFoa0osWCn3EM=";
           "sdk-x64" = "sha256-jWw5kXYGxu7oen8fK2Q58QPhiBRC6H2ibGXkeUFW2pI=";
+          "sdk-arm64" = lib.fakeHash;
           "ia32" = "sha256-oODdSKNlOPSLD9vAqRwYcAgH6mumyOB5Fp6G9ifSgok=";
           "x64" = "sha256-WhHV+xj2ngEz+i1ipBhwZD9b0EF/hdi8gMBZw5qYRGA=";
+          "arm64" = "sha256-C7R56EDV8h2O4HYH2AgjozHT44F/GPkDDKhvjQ2oUQM=";
         }
         ."${flavor + bits}";
     };
@@ -170,6 +176,7 @@ stdenv.mkDerivation {
     platforms = [
       "i686-linux"
       "x86_64-linux"
+      "aarch64-linux"
     ];
     sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
     maintainers = [ lib.maintainers.mikaelfangel ];
